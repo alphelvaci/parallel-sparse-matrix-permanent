@@ -3,14 +3,69 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define COLS 35
 #define ROWS COLS
 
 #include "skipper.h"
 
+unsigned next(unsigned g, unsigned j) {
+    //TODO
+    return 0;
+}
+
 double skip_per(crs_t crs, ccs_t ccs) {
-    return 0.0;
+    double x[ROWS];
+
+    double p = 1;
+    for (int i=0; i < ROWS; i++) {
+        double sum = 0;
+        for (int ptr = crs.row_pointers[i]; ptr < crs.row_pointers[i+1]; ptr++) {
+            sum += crs.row_values[ptr];
+        }
+        x[i] = crs.row_values[crs.row_pointers[i+1] - 1] - sum/2;
+        p *= x[i];
+    }
+
+    unsigned prev_g = 0;
+    unsigned curr_g = 1;
+
+    while (curr_g < pow(2, ROWS-1)) {
+        unsigned g_diff = prev_g ^ curr_g;
+        for (int j=0; j < ROWS; j++) {
+            if ((g_diff & (0b1 << j)) == 1) {
+                g_diff = g_diff & ~(0b1 << j);
+
+                unsigned gray_g_j;
+                if (curr_g < pow(2, j)) {
+                    gray_g_j = 0;
+                } else {
+                    gray_g_j = ((curr_g - (unsigned)pow(2, j)) / (unsigned)pow(2, j+1)) + 1;
+                }
+
+                double s = 2 * gray_g_j - 1;
+                for (int ptr = ccs.column_pointers[j]; ptr < ccs.column_pointers[j+1]; ptr++) {
+                    int row = ccs.rows[ptr];
+                    double value = ccs.column_values[ptr];
+                    x[row] += s * value;
+                }
+            }
+        }
+
+        double prod = 1;
+        for (int i=0; i < ROWS; i++) {
+            prod *= x[i];
+        }
+        p += pow(-1, curr_g) * prod;
+
+        prev_g = curr_g;
+
+        //TODO calculate curr_g using next
+        curr_g = curr_g + 1;
+    }
+
+    return p * (4 * (ROWS % 2) - 2);
 }
 
 int main() {
