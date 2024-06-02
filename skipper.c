@@ -1,3 +1,6 @@
+#pragma ide diagnostic ignored "NullDereference"
+#pragma ide diagnostic ignored "cert-err34-c"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,7 +22,7 @@ int main() {
     }
 
     int cols, non_zeros;
-    if (fscanf(file, "%d %d", &cols, &non_zeros) != 2 || cols != COLS) { // NOLINT(*-err34-c)
+    if (fscanf(file, "%d %d", &cols, &non_zeros) != 2 || cols != COLS) {
         perror("Invalid file");
         return EXIT_FAILURE;
     }
@@ -28,7 +31,7 @@ int main() {
     for (int i=0; i < non_zeros; i++) {
         int row, col;
         double value;
-        if (fscanf(file, "%d %d %lf", &row, &col, &value) != 3) { // NOLINT(*-err34-c)
+        if (fscanf(file, "%d %d %lf", &row, &col, &value) != 3) {
             perror("Invalid file");
             return EXIT_FAILURE;
         }
