@@ -14,8 +14,8 @@ int pow_neg1(unsigned a) {
     return 1 - 2 * ((int)a & 0b1);
 }
 
-unsigned pow2(unsigned a) {
-    return 0b1 << a;
+long unsigned pow2(unsigned a) {
+    return (long unsigned)0b1 << a;
 }
 
 unsigned next(unsigned g, unsigned j) {
@@ -36,14 +36,14 @@ double skip_per(crs_t crs, ccs_t ccs) {
         p *= x[i];
     }
 
-    unsigned prev_g = 0;
-    unsigned curr_g = 1;
+    long unsigned prev_g = 0;
+    long unsigned curr_g = 1;
 
     while (curr_g < pow2(ROWS-1)) {
         unsigned g_diff = prev_g ^ curr_g;
         for (int j=0; j < ROWS; j++) {
-            if ((g_diff & (0b1 << j)) == 1) {
-                g_diff = g_diff & ~(0b1 << j);
+            if ((g_diff & ((long unsigned)0b1 << j)) == 1) {
+                g_diff = g_diff & ~((long unsigned)0b1 << j);
 
                 unsigned gray_g_j;
                 if (curr_g < pow2(j)) {
