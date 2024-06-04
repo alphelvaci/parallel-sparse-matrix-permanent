@@ -10,6 +10,14 @@
 
 #include "skipper.h"
 
+int pow_neg1(unsigned a) {
+    return 1 - 2 * ((int)a & 0b1);
+}
+
+unsigned pow2(unsigned a) {
+    return 0b1 << a;
+}
+
 unsigned next(unsigned g, unsigned j) {
     //TODO
     return 0;
@@ -31,17 +39,17 @@ double skip_per(crs_t crs, ccs_t ccs) {
     unsigned prev_g = 0;
     unsigned curr_g = 1;
 
-    while (curr_g < pow(2, ROWS-1)) {
+    while (curr_g < pow2(ROWS-1)) {
         unsigned g_diff = prev_g ^ curr_g;
         for (int j=0; j < ROWS; j++) {
             if ((g_diff & (0b1 << j)) == 1) {
                 g_diff = g_diff & ~(0b1 << j);
 
                 unsigned gray_g_j;
-                if (curr_g < pow(2, j)) {
+                if (curr_g < pow2(j)) {
                     gray_g_j = 0;
                 } else {
-                    gray_g_j = ((curr_g - (unsigned)pow(2, j)) / (unsigned)pow(2, j+1)) + 1;
+                    gray_g_j = ((curr_g - pow2(j)) / pow2(j+1)) + 1;
                 }
 
                 double s = 2 * gray_g_j - 1;
@@ -57,7 +65,7 @@ double skip_per(crs_t crs, ccs_t ccs) {
         for (int i=0; i < ROWS; i++) {
             prod *= x[i];
         }
-        p += pow(-1, curr_g) * prod;
+        p += pow_neg1(curr_g) * prod;
 
         prev_g = curr_g;
 
