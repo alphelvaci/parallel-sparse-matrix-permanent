@@ -19,20 +19,26 @@ unsigned next(unsigned g, unsigned j) {
 }
 
 double skip_per(crs_t crs, ccs_t ccs) {
-    double x[ROWS];
+    double x[ROWS] = {0.0};
 
     for (int ptr = ccs.column_pointers[ROWS-1]; ptr < ccs.column_pointers[ROWS]; ptr++) {
-        x[ccs.rows[ptr]] += ccs.column_values[ptr];
+        x[ccs.rows[ptr]] = ccs.column_values[ptr];
     }
 
-    double p = 1;
     for (int i=0; i < ROWS; i++) {
         double sum = 0;
         for (int ptr = crs.row_pointers[i]; ptr < crs.row_pointers[i+1]; ptr++) {
             sum += crs.row_values[ptr];
         }
         x[i] -= sum / 2;
+    }
+
+    double p = 1;
+    for (int i=0; i < ROWS; i++) {
         p *= x[i];
+        if (p == 0) {
+            break;
+        }
     }
 
     long long unsigned prev_g = 0;
@@ -49,12 +55,14 @@ double skip_per(crs_t crs, ccs_t ccs) {
                 g_diff = g_diff & ~mask;
 
                 int curr_g_j = (curr_g & mask) != 0;
-
-                double s = 2 * curr_g_j - 1;
-                for (int ptr = ccs.column_pointers[bit_index]; ptr < ccs.column_pointers[bit_index+1]; ptr++) {
-                    int row = ccs.rows[ptr];
-                    double value = ccs.column_values[ptr];
-                    x[row] += s * value;
+                if (curr_g_j) {
+                    for (int ptr = ccs.column_pointers[bit_index]; ptr < ccs.column_pointers[bit_index+1]; ptr++) {
+                        x[ccs.rows[ptr]] += ccs.column_values[ptr];
+                    }
+                } else {
+                    for (int ptr = ccs.column_pointers[bit_index]; ptr < ccs.column_pointers[bit_index+1]; ptr++) {
+                        x[ccs.rows[ptr]] -= ccs.column_values[ptr];
+                    }
                 }
             }
             bit_index += 1;
@@ -78,7 +86,7 @@ double skip_per(crs_t crs, ccs_t ccs) {
         i += 1;
     }
 
-    return p * (4 * (ROWS % 2) - 2);
+    return p * (4 * (ROWS & 0b1) - 2);
 }
 
 int main() {
