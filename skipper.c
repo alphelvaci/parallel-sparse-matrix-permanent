@@ -13,9 +13,32 @@ long long unsigned pow2(unsigned exp) {
     return (long long unsigned)0b1 << exp;
 }
 
-unsigned next(unsigned g, unsigned j) {
-    //TODO
-    return 0;
+long long unsigned next(long long unsigned g, unsigned j) {
+    if (g < pow2(j)) {
+        return pow2(j);
+    } else {
+        return g + pow2(j + 1) - ((g - pow2(j) % pow2(j + 1)));
+    }
+}
+
+long long unsigned min_next(long long unsigned g, unsigned i, crs_t crs) {
+    long long unsigned min = UINT64_MAX;
+    for (int ptr = crs.row_pointers[i]; ptr < crs.row_pointers[i+1]; ptr++) {
+        if (next(g, crs.columns[ptr]) < min) {
+            min = next(g, crs.columns[ptr]);
+        }
+    }
+    return min;
+}
+
+long long unsigned next_max(long long unsigned g, crs_t crs) {
+    long long unsigned max = g + 1;
+    for (int i = 0; i < ROWS; i++) {
+        if(min_next(g, i, crs) > max) {
+            max = min_next(g, i, crs);
+        }
+    }
+    return max;
 }
 
 double skip_per(crs_t crs, ccs_t ccs) {
@@ -74,16 +97,18 @@ double skip_per(crs_t crs, ccs_t ccs) {
             prod *= x[j];
         }
 
-        if (i & 0b1) {
-            p -= prod;
+        if ((int)prod != 0) {
+            if (i & 0b1) {
+                p -= prod;
+            } else {
+                p += prod;
+            }
+            i += 1;
         } else {
-            p += prod;
+            i = next_max(i, crs);
         }
 
         prev_g = curr_g;
-
-        //TODO calculate i using next
-        i += 1;
     }
 
     return p * (4 * (ROWS & 0b1) - 2);
