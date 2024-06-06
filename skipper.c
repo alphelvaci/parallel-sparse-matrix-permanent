@@ -10,12 +10,12 @@
 
 #include "skipper.h"
 
-int pow_neg1(unsigned a) {
+int pow_neg1(long long unsigned a) {
     return 1 - 2 * ((int)a & 0b1);
 }
 
-long unsigned pow2(unsigned a) {
-    return (long unsigned)0b1 << a;
+long long unsigned pow2(long long unsigned a) {
+    return (long long unsigned)0b1 << a;
 }
 
 unsigned next(unsigned g, unsigned j) {
@@ -36,41 +36,42 @@ double skip_per(crs_t crs, ccs_t ccs) {
         p *= x[i];
     }
 
-    long unsigned prev_g = 0;
-    long unsigned curr_g = 1;
+    long long unsigned prev_g = 0;
+    long long unsigned curr_g;
 
-    while (curr_g < pow2(ROWS-1)) {
-        unsigned g_diff = prev_g ^ curr_g;
-        for (int j=0; j < ROWS; j++) {
-            if ((g_diff & ((long unsigned)0b1 << j)) == 1) {
-                g_diff = g_diff & ~((long unsigned)0b1 << j);
+    long long unsigned i = 1;
+    while (i < pow2(ROWS-1)) {
+        curr_g = i ^ (i >> 1);
+        long long unsigned g_diff = prev_g ^ curr_g;
+        long long unsigned mask = 0b1;
+        unsigned bit_index = 0;
+        while (g_diff > 0) {
+            if (g_diff & mask) {
+                g_diff = g_diff & ~mask;
 
-                unsigned gray_g_j;
-                if (curr_g < pow2(j)) {
-                    gray_g_j = 0;
-                } else {
-                    gray_g_j = ((curr_g - pow2(j)) / pow2(j+1)) + 1;
-                }
+                int curr_g_j = (curr_g & mask) != 0;
 
-                double s = 2 * gray_g_j - 1;
-                for (int ptr = ccs.column_pointers[j]; ptr < ccs.column_pointers[j+1]; ptr++) {
+                double s = 2 * curr_g_j - 1;
+                for (int ptr = ccs.column_pointers[bit_index]; ptr < ccs.column_pointers[bit_index+1]; ptr++) {
                     int row = ccs.rows[ptr];
                     double value = ccs.column_values[ptr];
                     x[row] += s * value;
                 }
             }
+            bit_index += 1;
+            mask = mask << 1;
         }
 
         double prod = 1;
-        for (int i=0; i < ROWS; i++) {
-            prod *= x[i];
+        for (int j=0; j < ROWS; j++) {
+            prod *= x[j];
         }
-        p += pow_neg1(curr_g) * prod;
+        p += pow_neg1(i) * prod;
 
         prev_g = curr_g;
 
-        //TODO calculate curr_g using next
-        curr_g = curr_g + 1;
+        //TODO calculate i using next
+        i += 1;
     }
 
     return p * (4 * (ROWS % 2) - 2);
