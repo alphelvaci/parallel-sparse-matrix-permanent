@@ -3,19 +3,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
-#define COLS 35
+#define COLS 7
 #define ROWS COLS
 
 #include "skipper.h"
 
-int pow_neg1(long long unsigned a) {
-    return 1 - 2 * ((int)a & 0b1);
-}
-
-long long unsigned pow2(long long unsigned a) {
-    return (long long unsigned)0b1 << a;
+long long unsigned pow2(unsigned exp) {
+    return (long long unsigned)0b1 << exp;
 }
 
 unsigned next(unsigned g, unsigned j) {
@@ -26,13 +21,17 @@ unsigned next(unsigned g, unsigned j) {
 double skip_per(crs_t crs, ccs_t ccs) {
     double x[ROWS];
 
+    for (int ptr = ccs.column_pointers[ROWS-1]; ptr < ccs.column_pointers[ROWS]; ptr++) {
+        x[ccs.rows[ptr]] += ccs.column_values[ptr];
+    }
+
     double p = 1;
     for (int i=0; i < ROWS; i++) {
         double sum = 0;
         for (int ptr = crs.row_pointers[i]; ptr < crs.row_pointers[i+1]; ptr++) {
             sum += crs.row_values[ptr];
         }
-        x[i] = crs.row_values[crs.row_pointers[i+1] - 1] - sum/2;
+        x[i] -= sum / 2;
         p *= x[i];
     }
 
@@ -66,7 +65,12 @@ double skip_per(crs_t crs, ccs_t ccs) {
         for (int j=0; j < ROWS; j++) {
             prod *= x[j];
         }
-        p += pow_neg1(i) * prod;
+
+        if (i & 0b1) {
+            p -= prod;
+        } else {
+            p += prod;
+        }
 
         prev_g = curr_g;
 
@@ -78,7 +82,7 @@ double skip_per(crs_t crs, ccs_t ccs) {
 }
 
 int main() {
-    FILE* file = fopen("ey35_02.mat", "r");
+    FILE* file = fopen("test7.mat", "r");
 
     if (file == NULL) {
         perror("Error opening file");
