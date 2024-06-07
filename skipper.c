@@ -85,12 +85,12 @@ void skipOrd(int *colPerm, int *rowPerm, int *degs, int n, const crs_t *crs) {
 }
 
 double skip_per(crs_t crs, ccs_t ccs, int threads) {
-    int *colPerm = (int *)malloc(ROWS * sizeof(int));
-    int *rowPerm = (int *)malloc(ROWS * sizeof(int));
-    int *degs = (int *)malloc(ROWS * sizeof(int));
+    // int *colPerm = (int *)malloc(ROWS * sizeof(int));
+    // int *rowPerm = (int *)malloc(ROWS * sizeof(int));
+    // int *degs = (int *)malloc(ROWS * sizeof(int));
 
-    // Apply SkipOrd to reorder the matrix
-    skipOrd(colPerm, rowPerm, degs, ROWS, &crs);
+    // // Apply SkipOrd to reorder the matrix
+    // skipOrd(colPerm, rowPerm, degs, ROWS, &crs);
 
     double x[ROWS] = {0.0};
 
@@ -164,8 +164,8 @@ double skip_per(crs_t crs, ccs_t ccs, int threads) {
             t_p += ((i & 1ULL) ? -1.0 : 1.0) * prod;
             i++;
         } else {
-            i = next_max(i, crs);
-            // i++;
+            // i = next_max(i, crs);
+            i++;
         }
         t_prev_gray = t_gray;
 
