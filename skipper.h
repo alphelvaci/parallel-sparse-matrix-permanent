@@ -21,5 +21,5 @@ typedef struct ccs_s {
 } ccs_t;
 
 void skip_ord(int* matrix[ROWS][COLS]);
-double skip_per(crs_t crs, ccs_t ccs);
+double skip_per(crs_t crs, ccs_t ccs, int threads);
 #endif
