@@ -18,6 +18,7 @@ long long unsigned pow2(unsigned exp) {
     return (long long unsigned)0b1 << exp;
 }
 
+// unused
 long long unsigned next(long long unsigned g, unsigned j) {
     if (g < pow2(j)) {
         return pow2(j);
@@ -26,6 +27,7 @@ long long unsigned next(long long unsigned g, unsigned j) {
     }
 }
 
+// unused
 long long unsigned min_next(long long unsigned g, unsigned i, crs_t crs) {
     long long unsigned min = UINT64_MAX;
     for (int ptr = crs.row_pointers[i]; ptr < crs.row_pointers[i+1]; ptr++) {
@@ -36,6 +38,7 @@ long long unsigned min_next(long long unsigned g, unsigned i, crs_t crs) {
     return min;
 }
 
+// unused
 long long unsigned next_max(long long unsigned g, crs_t crs) {
     long long unsigned max = g + 1;
     for (int i = 0; i < ROWS; i++) {
@@ -46,6 +49,7 @@ long long unsigned next_max(long long unsigned g, crs_t crs) {
     return max;
 }
 
+// unused
 void skipOrd(int *colPerm, int *rowPerm, int *degs, int n, const crs_t *crs) {
     bool *rowVisited = (bool *)malloc(n * sizeof(bool));
     memset(rowVisited, false, n * sizeof(bool));
@@ -89,7 +93,7 @@ double skip_per(crs_t crs, ccs_t ccs, int threads) {
     // int *rowPerm = (int *)malloc(ROWS * sizeof(int));
     // int *degs = (int *)malloc(ROWS * sizeof(int));
 
-    // // Apply SkipOrd to reorder the matrix
+    // Apply SkipOrd to reorder the matrix
     // skipOrd(colPerm, rowPerm, degs, ROWS, &crs);
 
     double x[ROWS] = {0.0};
